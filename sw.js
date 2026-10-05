@@ -17,8 +17,8 @@ messaging.onBackgroundMessage((payload) => {
   const d = payload.data || {};
   return self.registration.showNotification(d.title || 'اعلان جدید', {
     body: d.body || '',
-    icon: 'icons/icon-192.png',
-    badge: 'icons/icon-192.png',
+    icon: 'icon-192.png',
+    badge: 'icon-192.png',
     dir: 'rtl',
     lang: 'fa',
     tag: d.id || undefined,
