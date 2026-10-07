@@ -12,49 +12,59 @@
 :root{--paper:#F3F5F4;--ink:#14262B;--mute:#5B6F73;--line:#D5DDDC;--teal:#0F4C4C;--amber:#E0A100;--card:#fff;--err:#B3261E}
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:Vazirmatn,Tahoma,sans-serif;line-height:1.8;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
-header{background:var(--teal);color:#F3F5F4;padding:22px 20px 18px}
-header h1{margin:0;font-size:1.5rem;font-weight:800}
-header p{margin:2px 0 0;opacity:.8;font-size:.9rem}
+header{background:var(--teal);color:#F3F5F4;padding:20px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+header h1{margin:0;font-size:1.4rem;font-weight:800}
+header p{margin:0;opacity:.85;font-size:.85rem}
 main{max-width:640px;margin:0 auto;padding:16px}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:16px}
 .panel h2{margin:0 0 8px;font-size:1.05rem}
 label{display:block;font-size:.85rem;color:var(--mute);margin-top:8px}
 input{width:100%;font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink)}
-input:focus,button:focus-visible{outline:2px solid var(--amber);outline-offset:1px}
+input:focus,button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offset:1px}
 button{font:inherit;font-weight:600;background:var(--teal);color:#fff;border:0;border-radius:6px;padding:10px 18px;margin-top:12px;cursor:pointer}
-button.ghost{background:transparent;color:var(--teal);border:1px solid var(--teal)}
+button.ghost{background:transparent;color:var(--teal);border:1px solid var(--teal);margin:0;padding:5px 12px;font-size:.85rem}
+header button.ghost{color:#fff;border-color:#ffffff88}
 button:disabled{opacity:.5;cursor:default}
 .status{margin-top:10px;font-size:.9rem;color:var(--mute)}
 .status.err{color:var(--err)}.status.ok{color:var(--teal)}
 .bar{display:flex;justify-content:space-between;align-items:center}
-.bar button{margin:0;padding:5px 12px;font-size:.85rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:10px}
+.sys{display:block;text-decoration:none;color:var(--ink);border:1px solid var(--line);border-top:4px solid var(--sys,var(--teal));border-radius:8px;padding:12px;background:#FAFBFB}
+.sys .ic{font-size:1.6rem;line-height:1.2}.sys .n{font-weight:600}.sys .d{font-size:.78rem;color:var(--mute)}
 .item{border-inline-start:5px solid var(--sys,var(--teal));padding:8px 12px;margin-top:10px;background:#FAFBFB;border-radius:4px}
-.item .meta{font-size:.78rem;color:var(--mute)}
-.item .t{font-weight:600}
-.item a{color:var(--teal);font-size:.85rem}
+.item .meta{font-size:.78rem;color:var(--mute)}.item .t{font-weight:600}.item a{color:var(--teal);font-size:.85rem}
 .empty{color:var(--mute);margin:10px 0 0}
-.hidden{display:none}
+.hidden{display:none!important}
 .toast{position:fixed;inset-inline:16px;bottom:calc(16px + env(safe-area-inset-bottom));background:var(--ink);color:#fff;padding:12px 14px;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
 </style>
 </head>
 <body>
-<header><h1>مرکز اعلان سامانه‌ها</h1><p>اعلان همه‌ی سامانه‌ها در یک‌جا</p></header>
+<header>
+  <div><h1>مرکز سامانه‌ها</h1><p id="who">اعلان‌ها و دسترسی به سامانه‌ها</p></div>
+  <button class="ghost hidden" id="logout">خروج</button>
+</header>
 <main>
-  <section class="panel" id="setup">
-    <h2>فعال‌سازی اعلان</h2>
-    <p id="iosHint" class="status hidden">در آیفون ابتدا از منوی اشتراک‌گذاری مرورگر، «Add to Home Screen» را بزنید و برنامه را از روی صفحه‌ی اصلی باز کنید.</p>
-    <label for="name">نام و نام خانوادگی</label>
-    <input id="name" autocomplete="name">
-    <label for="role">نقش یا واحد (مثلاً: انبار، آزمایشگاه، ایمنی)</label>
-    <input id="role">
-    <button id="enable">فعال‌سازی اعلان در این دستگاه</button>
-    <div id="status" class="status"></div>
+  <section class="panel hidden" id="login">
+    <h2>ورود</h2>
+    <label for="u">نام کاربری</label><input id="u" autocomplete="username" autocapitalize="none">
+    <label for="p">رمز عبور</label><input id="p" type="password" autocomplete="current-password">
+    <button id="go">ورود</button>
+    <div id="lst" class="status"></div>
   </section>
 
-  <section class="panel">
-    <div class="bar"><h2>صندوق اعلان‌ها</h2><button class="ghost" id="refresh">به‌روزرسانی</button></div>
-    <div id="list"></div>
-  </section>
+  <div id="app" class="hidden">
+    <section class="panel"><h2>سامانه‌ها</h2><div id="systems" class="grid"></div></section>
+    <section class="panel" id="pushPanel">
+      <h2>اعلان روی این دستگاه</h2>
+      <p id="iosHint" class="status hidden">در آیفون ابتدا از منوی اشتراک‌گذاری مرورگر، «Add to Home Screen» را بزنید و برنامه را از روی صفحه‌ی اصلی باز کنید.</p>
+      <button id="enable" style="margin-top:0">فعال‌سازی اعلان</button>
+      <div id="pst" class="status"></div>
+    </section>
+    <section class="panel">
+      <div class="bar"><h2>صندوق اعلان‌ها</h2><button class="ghost" id="refresh">به‌روزرسانی</button></div>
+      <div id="list"></div>
+    </section>
+  </div>
 </main>
 <div id="toast" class="toast hidden"></div>
 
@@ -62,99 +72,118 @@ button:disabled{opacity:.5;cursor:default}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
 
-// ⚠️ آدرس وب‌اپ Apps Script (بعد از Deploy) را اینجا بگذارید
 const HUB_URL = "https://script.google.com/macros/s/AKfycbzggqA5iFJkA5bUKc_uPw0LCdFVDiZVKrYp_vRyU9mumT2R2RyS4F49IUom9E-SoAlKEw/exec";
 const VAPID_KEY = "BIZ0-KrZ4Mfta1JQjCyaai2C8_tkSHVnKdWcQwV7VM5I7yqRr8aRlt89hfdAoT5a_0K1SkBawj8Uow9yMZHjBjo";
 const firebaseConfig = {
-  apiKey: "AIzaSyDBjqheH4lB9agmu5VGHCwOreXZL1BvUU0",
-  authDomain: "mohammad-55d06.firebaseapp.com",
-  projectId: "mohammad-55d06",
-  storageBucket: "mohammad-55d06.firebasestorage.app",
-  messagingSenderId: "192200886544",
-  appId: "1:192200886544:web:8d02ebe03ba8d2e451fd95"
+  apiKey: "AIzaSyDBjqheH4lB9agmu5VGHCwOreXZL1BvUU0", authDomain: "mohammad-55d06.firebaseapp.com",
+  projectId: "mohammad-55d06", storageBucket: "mohammad-55d06.firebasestorage.app",
+  messagingSenderId: "192200886544", appId: "1:192200886544:web:8d02ebe03ba8d2e451fd95"
 };
 
 const $ = (id) => document.getElementById(id);
-const store = {
-  get: (k) => { try { return localStorage.getItem(k) || ''; } catch { return ''; } },
-  set: (k, v) => { try { localStorage.setItem(k, v); } catch {} }
+const S = {
+  get: (k) => { try { return localStorage.getItem(k) || ""; } catch { return ""; } },
+  set: (k, v) => { try { localStorage.setItem(k, v); } catch {} },
+  del: (k) => { try { localStorage.removeItem(k); } catch {} }
 };
 const COLORS = ["#0F4C4C", "#B26A00", "#6B3FA0", "#1F5FA8", "#A33A5B", "#4C7A1E"];
 const colorFor = (s) => { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) >>> 0; return COLORS[h % COLORS.length]; };
+const say = (id, msg, cls = "") => { const e = $(id); e.textContent = msg; e.className = "status " + cls; };
+const toast = (m) => { const t = $("toast"); t.textContent = m; t.classList.remove("hidden"); setTimeout(() => t.classList.add("hidden"), 5000); };
 
-function setStatus(msg, cls = "") { const s = $("status"); s.textContent = msg; s.className = "status " + cls; }
-function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.remove("hidden"); setTimeout(() => t.classList.add("hidden"), 5000); }
-
-$("name").value = store.get("name");
-$("role").value = store.get("role");
-const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone;
-if (isIOS && !standalone) $("iosHint").classList.remove("hidden");
-
-async function hub(payload) {
-  const r = await fetch(HUB_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
+async function api(p) {
+  const r = await fetch(HUB_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(p) });
   return r.json();
 }
 
-async function loadList() {
-  const token = store.get("token");
-  const box = $("list");
-  box.textContent = "";
-  if (!token) { box.innerHTML = '<p class="empty">برای دیدن اعلان‌ها، اول اعلان را در این دستگاه فعال کنید.</p>'; return; }
-  try {
-    const res = await (await fetch(HUB_URL + "?action=list&token=" + encodeURIComponent(token))).json();
-    if (!res.ok || !res.items.length) { box.innerHTML = '<p class="empty">هنوز اعلانی نیامده است.</p>'; return; }
-    for (const n of res.items) {
-      const el = document.createElement("div");
-      el.className = "item";
-      el.style.setProperty("--sys", colorFor(n.system || ""));
-      const meta = document.createElement("div"); meta.className = "meta";
-      meta.textContent = (n.system || "") + " | " + new Date(n.time).toLocaleString("fa-IR");
-      const t = document.createElement("div"); t.className = "t"; t.textContent = n.title;
-      const b = document.createElement("div"); b.textContent = n.body;
-      el.append(meta, t, b);
-      if (/^https:\/\//.test(n.url || "")) {
-        const a = document.createElement("a"); a.href = n.url; a.target = "_blank"; a.rel = "noopener"; a.textContent = "باز کردن سامانه";
-        el.append(a);
-      }
-      box.append(el);
-    }
-  } catch (e) { box.innerHTML = '<p class="empty">دریافت اعلان‌ها ممکن نشد. اتصال اینترنت را بررسی کنید.</p>'; }
+function showLogin() {
+  $("login").classList.remove("hidden"); $("app").classList.add("hidden"); $("logout").classList.add("hidden");
+  $("who").textContent = "اعلان‌ها و دسترسی به سامانه‌ها";
 }
 
-async function enable() {
-  const name = $("name").value.trim(), role = $("role").value.trim();
-  if (!name) return setStatus("نام را وارد کنید.", "err");
-  if (!HUB_URL.startsWith("https://")) return setStatus("آدرس Apps Script در فایل index.html تنظیم نشده است.", "err");
-  if (!("serviceWorker" in navigator) || !("PushManager" in window)) return setStatus("این مرورگر از اعلان پشتیبانی نمی‌کند.", "err");
-  $("enable").disabled = true;
+function render(d) {
+  $("login").classList.add("hidden"); $("app").classList.remove("hidden"); $("logout").classList.remove("hidden");
+  $("who").textContent = d.user.name + (d.user.role ? " | " + d.user.role : "");
+
+  const g = $("systems"); g.textContent = "";
+  if (!d.systems.length) g.innerHTML = '<p class="empty">سامانه‌ای برای شما تعریف نشده است.</p>';
+  for (const s of d.systems) {
+    if (!/^https:\/\//.test(s.url)) continue;
+    const a = document.createElement("a"); a.className = "sys"; a.href = s.url; a.target = "_blank"; a.rel = "noopener";
+    a.style.setProperty("--sys", colorFor(s.name));
+    const ic = document.createElement("div"); ic.className = "ic"; ic.textContent = s.icon;
+    const n = document.createElement("div"); n.className = "n"; n.textContent = s.name;
+    const ds = document.createElement("div"); ds.className = "d"; ds.textContent = s.desc;
+    a.append(ic, n, ds); g.append(a);
+  }
+
+  const box = $("list"); box.textContent = "";
+  if (!d.items.length) box.innerHTML = '<p class="empty">هنوز اعلانی نیامده است.</p>';
+  for (const n of d.items) {
+    const el = document.createElement("div"); el.className = "item";
+    el.style.setProperty("--sys", colorFor(n.system || ""));
+    const m = document.createElement("div"); m.className = "meta"; m.textContent = (n.system || "") + " | " + new Date(n.time).toLocaleString("fa-IR");
+    const t = document.createElement("div"); t.className = "t"; t.textContent = n.title;
+    const b = document.createElement("div"); b.style.whiteSpace = "pre-line"; b.textContent = n.body;
+    el.append(m, t, b);
+    if (/^https:\/\//.test(n.url || "")) {
+      const a = document.createElement("a"); a.href = n.url; a.target = "_blank"; a.rel = "noopener"; a.textContent = "باز کردن";
+      el.append(a);
+    }
+    box.append(el);
+  }
+}
+
+async function loadHome() {
   try {
-    const perm = await Notification.requestPermission();
-    if (perm !== "granted") throw new Error("اجازه‌ی اعلان داده نشد. آن را در تنظیمات مرورگر فعال کنید.");
+    const d = await api({ action: "home", session: S.get("session") });
+    if (!d.ok) { S.del("session"); showLogin(); return false; }
+    render(d); return true;
+  } catch { toast("اتصال به سرور برقرار نشد."); return false; }
+}
+
+let messaging = null, listening = false;
+async function enablePush(silent) {
+  try {
+    if (typeof Notification === "undefined" || !("serviceWorker" in navigator) || !("PushManager" in window)) throw new Error("این مرورگر از اعلان پشتیبانی نمی‌کند.");
+    if (Notification.permission !== "granted") {
+      if (silent) return;
+      if ((await Notification.requestPermission()) !== "granted") throw new Error("اجازه‌ی اعلان داده نشد. آن را در تنظیمات مرورگر فعال کنید.");
+    }
     const reg = await navigator.serviceWorker.register("./sw.js");
     await navigator.serviceWorker.ready;
-    const messaging = getMessaging(initializeApp(firebaseConfig));
+    messaging = messaging || getMessaging(initializeApp(firebaseConfig));
     const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
     if (!token) throw new Error("توکن دریافت نشد.");
-    const res = await hub({ action: "register", token, name, role });
-    if (!res.ok) throw new Error(res.error || "ثبت در سرور انجام نشد.");
-    store.set("name", name); store.set("role", role); store.set("token", token);
-    setStatus("اعلان در این دستگاه فعال شد.", "ok");
-    onMessage(messaging, (p) => { const d = p.data || {}; toast((d.title || "") + " - " + (d.body || "")); loadList(); });
-    loadList();
-  } catch (e) { setStatus(e.message || "خطا در فعال‌سازی.", "err"); }
-  $("enable").disabled = false;
+    const r = await api({ action: "register", session: S.get("session"), token });
+    if (!r.ok) throw new Error(r.error || "ثبت در سرور انجام نشد.");
+    S.set("token", token);
+    say("pst", "اعلان روی این دستگاه فعال است.", "ok");
+    if (!listening) { listening = true; onMessage(messaging, (p) => { const d = p.data || {}; toast((d.title || "") + " - " + (d.body || "")); loadHome(); }); }
+  } catch (e) { if (!silent) say("pst", e.message || "خطا در فعال‌سازی.", "err"); }
 }
 
-$("enable").onclick = enable;
-$("refresh").onclick = loadList;
-if (store.get("token") && Notification.permission === "granted") {
-  setStatus("اعلان در این دستگاه فعال است.", "ok");
-  navigator.serviceWorker.register("./sw.js").then(() => {
-    onMessage(getMessaging(initializeApp(firebaseConfig)), (p) => { const d = p.data || {}; toast((d.title || "") + " - " + (d.body || "")); loadList(); });
-  });
-}
-loadList();
+$("go").onclick = async () => {
+  const u = $("u").value.trim(), p = $("p").value;
+  if (!u || !p) return say("lst", "نام کاربری و رمز را وارد کنید.", "err");
+  $("go").disabled = true; say("lst", "در حال ورود...");
+  try {
+    const r = await api({ action: "login", username: u, password: p });
+    if (!r.ok) say("lst", r.error || "ورود ناموفق بود.", "err");
+    else { S.set("session", r.session); $("p").value = ""; say("lst", ""); if (await loadHome()) enablePush(true); }
+  } catch { say("lst", "اتصال به سرور برقرار نشد.", "err"); }
+  $("go").disabled = false;
+};
+$("p").addEventListener("keydown", (e) => { if (e.key === "Enter") $("go").click(); });
+$("logout").onclick = async () => {
+  try { await api({ action: "logout", session: S.get("session"), token: S.get("token") }); } catch {}
+  S.del("session"); S.del("token"); showLogin();
+};
+$("enable").onclick = () => enablePush(false);
+$("refresh").onclick = loadHome;
+
+if (/iphone|ipad|ipod/i.test(navigator.userAgent) && !(matchMedia("(display-mode: standalone)").matches || navigator.standalone)) $("iosHint").classList.remove("hidden");
+if (S.get("session")) loadHome().then((ok) => { if (ok) enablePush(true); }); else showLogin();
 </script>
 </body>
 </html>
