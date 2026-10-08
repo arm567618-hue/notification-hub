@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -120,7 +121,21 @@ function render(d) {
       } catch (err) { if (w) w.close(); toast("باز کردن سامانه ممکن نشد."); }
     };
     a.style.setProperty("--sys", colorFor(s.name));
-    const ic = document.createElement("div"); ic.className = "ic"; ic.textContent = s.icon;
+    const ic = document.createElement("div"); ic.className = "ic";
+    if (/^https:\/\//.test(s.icon)) {
+      const img = document.createElement("img");
+      img.src = s.icon;
+      img.alt = s.name;
+      img.style.width = "42px";
+      img.style.height = "42px";
+      img.style.objectFit = "contain";
+      img.style.borderRadius = "8px";
+      img.style.display = "block";
+      img.style.margin = "0 auto 6px";
+      ic.appendChild(img);
+    } else {
+      ic.textContent = s.icon || "📦";
+    }
     const n = document.createElement("div"); n.className = "n"; n.textContent = s.name;
     const ds = document.createElement("div"); ds.className = "d"; ds.textContent = s.desc;
     a.append(ic, n, ds); g.append(a);
@@ -196,3 +211,4 @@ if (S.get("session")) loadHome().then((ok) => { if (ok) enablePush(true); }); el
 </script>
 </body>
 </html>
+```
