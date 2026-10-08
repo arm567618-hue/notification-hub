@@ -110,6 +110,15 @@ function render(d) {
   for (const s of d.systems) {
     if (!/^https:\/\//.test(s.url)) continue;
     const a = document.createElement("a"); a.className = "sys"; a.href = s.url; a.target = "_blank"; a.rel = "noopener";
+    a.onclick = async (e) => {
+      e.preventDefault();
+      const w = window.open("", "_blank");
+      try {
+        const r = await api({ action: "launch", session: S.get("session"), system: s.name });
+        if (!r.ok) throw new Error(r.error);
+        if (w) w.location.href = r.url; else location.href = r.url;
+      } catch (err) { if (w) w.close(); toast("باز کردن سامانه ممکن نشد."); }
+    };
     a.style.setProperty("--sys", colorFor(s.name));
     const ic = document.createElement("div"); ic.className = "ic"; ic.textContent = s.icon;
     const n = document.createElement("div"); n.className = "n"; n.textContent = s.name;
